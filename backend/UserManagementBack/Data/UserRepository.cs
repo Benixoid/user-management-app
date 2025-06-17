@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using UserManagementBack.Config;
 using UserManagementBack.Models;
 using UserManagementBack.Models.DTO;
 
@@ -14,18 +15,21 @@ namespace UserManagementBack.Data
             _logger = logger;
         }
 
-        public async Task<IEnumerable<UserDTO>> GetNotDeletedPaginatedAsync(int skip = 0, int take = 20, string emailFilter = "", string nameFilter = "")
+        public async Task<IEnumerable<UserDTO>> GetNotDeletedPaginatedAsync(PaginationParams paginationParams)
         {
             var query = _dbSet.Where(u => !u.IsDeleted);
-            if (!string.IsNullOrEmpty(emailFilter))
+            if (!string.IsNullOrEmpty(paginationParams.EmailFilter))
             {
-                query = query.Where(u => u.Email.Contains(emailFilter, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(u => u.Email.ToUpper().Contains(paginationParams.EmailFilter.ToUpper()));
             }
-            if (!string.IsNullOrEmpty(nameFilter))
+            if (!string.IsNullOrEmpty(paginationParams.NameFilter))
             {
-                query = query.Where(u => u.FullName.Contains(nameFilter, StringComparison.OrdinalIgnoreCase));
+                query = query.Where(u => u.FullName.ToUpper().Contains(paginationParams.NameFilter.ToUpper()));
             }
-            var entities = await query.Skip(skip).Take(take).ToListAsync();
+            var entities = await query
+                .Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize)
+                .Take(paginationParams.PageSize)
+                .ToListAsync();
             return _mapper.Map<IEnumerable<UserDTO>>(entities);
         }
     }

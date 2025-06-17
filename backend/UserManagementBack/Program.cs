@@ -5,6 +5,7 @@ using Serilog;
 using UserManagementBack.Config;
 using UserManagementBack.Data;
 using UserManagementBack.Helpers;
+using UserManagementBack.Services;
 
 namespace UserManagementBack
 {
@@ -22,6 +23,21 @@ namespace UserManagementBack
             try
             {
                 var builder = WebApplication.CreateBuilder(args);
+
+                var corsOrigins = "UserAppTest";
+
+                builder.Services.AddCors(options =>
+                {
+                    options.AddPolicy(name: corsOrigins,
+                                      policy => {
+                                          policy.WithOrigins("https://localhost:5073",
+                                                              "http://localhost:7188",
+                                                              "https://localhost:4200",
+                                                              "http://localhost:4200"
+                                                              )
+                                          .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
+                                      });
+                });
 
                 builder.Services.AddApiVersioning(options => {
                     options.DefaultApiVersion = new ApiVersion(1, 0);
@@ -42,6 +58,8 @@ namespace UserManagementBack
                 builder.Services.AddSingleton(Log.Logger);
                 builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
                 builder.Services.AddScoped<IUserRepository, UserRepository>();
+                builder.Services.AddScoped<IUserService, UserService>();
+                builder.Services.AddScoped<IDataManager, DataManager>();
                 builder.Services.AddControllers();
 
                 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -71,8 +89,11 @@ namespace UserManagementBack
 
                 app.UseHttpsRedirection();
 
+                app.UseCors(corsOrigins);
+
                 app.UseAuthorization();
 
+                app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
                 app.MapControllers();
 
