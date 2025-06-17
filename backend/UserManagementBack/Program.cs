@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using UserManagementBack.Config;
 using UserManagementBack.Data;
 using UserManagementBack.Helpers;
 
@@ -22,8 +23,12 @@ namespace UserManagementBack
                 var builder = WebApplication.CreateBuilder(args);
 
                 // Add services to the container.
-
+                builder.Services.AddAutoMapper(cfg => cfg.AddProfile<MapperProfile>());
+                builder.Services.AddSingleton(Log.Logger);
+                builder.Services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+                builder.Services.AddScoped<IUserRepository, UserRepository>();
                 builder.Services.AddControllers();
+
                 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen();
@@ -36,6 +41,7 @@ namespace UserManagementBack
                     return;
                 }
                 var decryptedPassword = MyEncryption.DecryptString(password);
+
                 builder.Services.AddDbContext<AppDbContext>(opts =>
                     opts.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") + ";Password=" + decryptedPassword));
 
@@ -56,6 +62,10 @@ namespace UserManagementBack
                 app.MapControllers();
 
                 app.Run();
+            }
+            catch (HostAbortedException)
+            {
+                Log.Information("Application host was aborted, shutting down gracefully.");
             }
             catch (Exception ex)
             {
