@@ -62,9 +62,11 @@ namespace UserManagementBack.Data
 
         public virtual async Task<TEntityDTO> UpdateNotDeletedAsync(TEntityDTO updateDTO)
         {
-            
+            var entityDB = await _dbSet.FirstOrDefaultAsync(e => e.Id == updateDTO.Id && !e.IsDeleted);
             var entity = _mapper.Map<TEntity>(updateDTO);
+
             entity.UpdatedAt = DateTime.UtcNow;
+            entity.CreatedAt = entityDB?.CreatedAt ?? DateTime.UtcNow;
             _logger.LogInformation($"Updating entity of type: {entity.GetType().Name}");
             _context.Update(entity);
             await _context.SaveChangesAsync();
@@ -78,6 +80,7 @@ namespace UserManagementBack.Data
             {
                 entity.IsDeleted = false;
                 entity.DeletedAt = null;
+                entity.UpdatedAt = DateTime.UtcNow;
                 _context.Update(entity);
                 await _context.SaveChangesAsync();
             }
