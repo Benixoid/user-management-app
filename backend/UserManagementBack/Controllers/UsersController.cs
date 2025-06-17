@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 
 namespace UserManagementBack.Controllers
 {
     [ApiController]
-    [Route("api/")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     public class UsersController : ControllerBase
     {
         private readonly ILogger<UsersController> _logger;
