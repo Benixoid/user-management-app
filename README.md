@@ -53,13 +53,11 @@ A simple user management system (CRUD) with a .NET backend and React frontend.
   - ASP.NET MVC5 or .NET 8
   - C#
   - Entity Framework (Code First)
-  - SQL Server or PostgreSQL
+  - PostgreSQL
 - Frontend:
-  - React
+  - Angular
   - TypeScript
   - TailwindCSS 3
-  - Axios
-  - (optional) Redux Toolkit, Vite
 - Git for version control
 
 ## 🚀 Quick Start
@@ -83,7 +81,7 @@ dotnet run
 ```bash
 cd frontend
 npm install
-npm run dev
+ng serve
 ```
 
 ### (Optional) Run via Docker

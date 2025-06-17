@@ -5,16 +5,14 @@
         public bool Success { get; set; }
         public required string Message { get; set; }
         public string? ErrorCode { get; set; }
-        public T? Data { get; set; }
-        public PaginationMetadata? Pagination { get; set; }
-        public static ApiResponse<T> SuccessResponse(T data, string? message = null, PaginationMetadata? pagination = null)
+        public T? Data { get; set; }        
+        public static ApiResponse<T> SuccessResponse(T data, string? message = null)
         {
             return new ApiResponse<T>
             {
                 Success = true,
                 Data = data,
-                Message = message ?? "Operation completed successfully",
-                Pagination = pagination
+                Message = message ?? "Operation completed successfully"
             };
         }
 
