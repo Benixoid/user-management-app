@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using System.Data;
 using UserManagementBack.Config;
 using UserManagementBack.Data;
 using UserManagementBack.Models.DTO;
@@ -24,6 +25,16 @@ namespace UserManagementBack.Services
             {
                 _logger.LogError($"Invalid role specified: {createDto.Role} for user: {createDto.FullName}");
                 return await Task.FromResult(Result<UserDTO>.Failure("INVALID_ROLE", "Invalid role specified. Valid roles are 'Admin', 'Manager', or 'User'."));
+            }
+            if (string.IsNullOrEmpty(createDto.FullName))
+            {
+                _logger.LogError("FullName is required for user creation.");
+                return await Task.FromResult(Result<UserDTO>.Failure("INVALID_DATA", "FullName is required."));
+            }
+            if (string.IsNullOrEmpty(createDto.Email))
+            {
+                _logger.LogError("Email is required for user creation.");
+                return await Task.FromResult(Result<UserDTO>.Failure("INVALID_DATA", "Email is required."));
             }
             createDto.Id = Guid.Empty;
             var created = await dataManager.Users.CreateAsync(createDto);
@@ -78,6 +89,16 @@ namespace UserManagementBack.Services
                 {
                     _logger.LogError($"Invalid role specified: {updateDto.Role} for user ID: {updateDto.Id}");
                     return Result<UserDTO>.Failure("INVALID_ROLE", "Invalid role specified. Valid roles are 'Admin', 'Manager', or 'User'.");
+                }
+                if (string.IsNullOrEmpty(updateDto.FullName))
+                {
+                    _logger.LogError("FullName is required for user creation.");
+                    return await Task.FromResult(Result<UserDTO>.Failure("INVALID_DATA", "FullName is required."));
+                }
+                if (string.IsNullOrEmpty(updateDto.Email))
+                {
+                    _logger.LogError("Email is required for user creation.");
+                    return await Task.FromResult(Result<UserDTO>.Failure("INVALID_DATA", "Email is required."));
                 }
                 // Update the entity with the new values
                 var updated = await dataManager.Users.UpdateNotDeletedAsync(updateDto);

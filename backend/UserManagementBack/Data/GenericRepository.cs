@@ -62,7 +62,7 @@ namespace UserManagementBack.Data
 
         public virtual async Task<TEntityDTO> UpdateNotDeletedAsync(TEntityDTO updateDTO)
         {
-            var entityDB = await _dbSet.FirstOrDefaultAsync(e => e.Id == updateDTO.Id && !e.IsDeleted);
+            var entityDB = await _dbSet.AsNoTracking().FirstOrDefaultAsync(e => e.Id == updateDTO.Id && !e.IsDeleted);
             var entity = _mapper.Map<TEntity>(updateDTO);
 
             entity.UpdatedAt = DateTime.UtcNow;

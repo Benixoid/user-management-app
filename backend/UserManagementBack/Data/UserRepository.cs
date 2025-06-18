@@ -29,6 +29,7 @@ namespace UserManagementBack.Data
             var entities = await query
                 .Skip((paginationParams.PageNumber - 1) * paginationParams.PageSize)
                 .Take(paginationParams.PageSize)
+                .AsNoTracking()
                 .ToListAsync();
             return _mapper.Map<IEnumerable<UserDTO>>(entities);
         }
